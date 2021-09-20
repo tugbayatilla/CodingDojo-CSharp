@@ -29,29 +29,30 @@ Task:
 # requirements
 - increase the salary of the employee and mark as increased in employee, return the final salary
 - if something happens to should not write in database
-
+CalculateNextSalaryIncrease 
+- it get all the salary logs and returns mean of the odd salaries increases.
 - final salary must be fetched again
 
 you are the developer who knows only these interfaces and that's it. no database, no system. nothing.
 you need to make sure that given requirements for the methods will be covered by unit tests.
+
+
+
+
 */
 
 
 #region implementation
 public class EmployeeBusiness : IEmployeeBusiness
 {
-	private IEmployeeRepository _employeeRepository;
-	
-	public decimal IncreaseSalary(string name, decimal salary)
+	public decimal CalculateNextSalaryIncrease(decimal[] previousSalaryIncreases)
 	{
-		//TODO: where can i find the employeeId?   //int.Parse(name) );
-		//var employee = _employeeRepository.GetById();  
-		
-		return salary;
+		throw new NotImplementedException();
 	}
-	
-	internal Employee GetEmployeeEasily(string name){
-		return null;
+
+	public decimal IncreaseSalary(string name, decimal? salaryIncrease = null)
+	{
+		throw new NotImplementedException();
 	}
 }
 #endregion
@@ -60,10 +61,11 @@ public class EmployeeBusiness : IEmployeeBusiness
 #region Do not change it
 public interface IEmployeeBusiness
 {
-	decimal IncreaseSalary(string name, decimal salary);
+	decimal IncreaseSalary(string name, decimal? salaryIncrease = null);
+	decimal CalculateNextSalaryIncrease(decimal[] previousSalaryIncreases);
 }
 
-public interface IUnitOfWork
+public interface IUnitOfWork : IDisposable
 {
 	IDbConnection Connection { get; }
 	IDbTransaction Transaction { get; }
@@ -74,32 +76,29 @@ public interface IUnitOfWork
 
 public interface IEmployeeRepository
 {
-	Employee GetByName(string name);
-	
-	[Obsolete("use SetSalaryIncreasedFlag2 instead!")]
-	void SetSalaryIncreasedFlag(int employeeId);
-	
-	void SetSalaryIncreasedFlag2(int employeeId);
+	Employee Get(string name);
+	void Update(int employeeId, decimal salary);
 }
 
-public interface ISalaryRepository
+public interface ISalaryLogRepository
 {
-	decimal GetSalary(int employeeId);
-	void UpdateSalary(int employeeId, decimal salary);
+	void Insert(SalaryLog log);
+	SalaryLog[] Select(int employeeId);
 }
 
 public class Employee
 {
 	public int Id { get; set; }
 	public string Name { get; set; }
-	public bool SalaryIncreased { get; set; }
+	public decimal CurrentSalary { get; set; }
 }
 
-public class Salary
+public class SalaryLog
 {
 	public int Id { get; set; }
 	public int EmployeeId { get; set; }
-	public decimal Amount { get; set; }
+	public decimal PreviousSalary { get; set; }
+	public decimal CurrentSalary { get; set; }
 }
 #endregion
 
@@ -120,21 +119,5 @@ void When_IncreaseSalary_called_with_salary_Then_returns_value_greater_or_equal_
 	actual.Should().BeGreaterOrEqualTo(increasingSalary);
 }
 
-[Fact]
-void When_IncreaseSalary_called_with_salary_Then_Employee_must_be_fetched()
-{
-	//arrange
-	var employeeBusiness = new EmployeeBusiness();
-	var increasingSalary = 5;
-	var employeeRepositoryMock = new Mock<IEmployeeRepository>();
-	//TODO: initialize (pass the mock) IEmployeeRepository in employeeBusiness class
-
-	//act
-	var actual = employeeBusiness.IncreaseSalary(It.IsAny<string>(), increasingSalary);
-
-	//assert
-	actual.Should().BeGreaterOrEqualTo(increasingSalary);
-	employeeRepositoryMock.Verify(m => m.GetById(It.IsAny<int>()), Times.Once);
-}
 
 #endregion
