@@ -49,14 +49,28 @@ TDD
 #region implementation
 public class EmployeeBusiness : IEmployeeBusiness
 {
-	public decimal CalculateNextSalaryIncrease(decimal[] previousSalaryIncreases)
+	public virtual decimal CalculateNextSalaryIncrease(decimal[] previousSalaryIncreases)
 	{
-		throw new NotImplementedException();
+		return 0;
 	}
 
 	public void IncreaseSalary(string email, decimal? salaryIncrease = null)
 	{
-		throw new NotImplementedException();
+		var employee = GetEmployeeByEmail(email);
+
+		if (salaryIncrease == null)
+		{
+			salaryIncrease = CalculateNextSalaryIncrease(null);
+		}
+
+	}
+
+	//returns: valid employee?
+	//returns: exception?
+	//returns: null?
+	internal Employee GetEmployeeByEmail(string email)
+	{
+		return new Employee();
 	}
 }
 #endregion
@@ -110,7 +124,63 @@ public class SalaryLog : IDbEntity
 
 #region private::Tests
 
+private Mock<EmployeeBusiness> createEmployeeBusinessMock(bool callBase = true)
+{
+	var employeeBusinessMock = new Mock<EmployeeBusiness>();
+	employeeBusinessMock.CallBase = callBase;
+	
+	return employeeBusinessMock;
+}
+
 [Fact]
-void Test()=>true.Should().BeTrue();
+void When_IncreaseSalary_called_And_salaryIncrease_Notnull_Then_CalculateNextSalaryIncrease_should_not_called()
+{
+	//arrange
+	var employeeBusinessMock = createEmployeeBusinessMock();
+	
+	//act
+	employeeBusinessMock.Object.IncreaseSalary(It.IsAny<string>(), 10.0m); 
+	
+	//assert
+	employeeBusinessMock.Verify(m => m.CalculateNextSalaryIncrease(It.IsAny<decimal[]>()), Times.Never);
+}
+
+[Fact]
+void When_IncreaseSalary_called_And_salaryIncrease_Null_Then_CalculateNextSalaryIncrease_should_be_called()
+{
+	//arrange
+	var employeeBusinessMock = createEmployeeBusinessMock();
+
+	//act
+	employeeBusinessMock.Object.IncreaseSalary(It.IsAny<string>(), null);
+
+	//assert
+	employeeBusinessMock.Verify(m => m.CalculateNextSalaryIncrease(It.IsAny<decimal[]>()), Times.Once);
+}
+
+[Fact]
+void When_getEmployeeByEmail_called_with_not_empty_email_then_Employee_should_be_returned()
+{
+	//arrange
+	var employeeBusinessMock = createEmployeeBusinessMock();
+
+	//act
+	var employee = employeeBusinessMock.Object.GetEmployeeByEmail(It.IsAny<string>());
+	
+	//assert
+	Assert.IsType(typeof(Employee), employee);
+}
+
+[Fact]
+void When_IncreaseSalary_called_Then_employee_data_must_be_get_by_email()
+{
+	//arrange
+	true.Should().BeFalse("implement me!");
+	//act
+
+	//assert
+}
+
+
 
 #endregion
