@@ -15,29 +15,33 @@
 
 void Main()
 {
-	RunTests();  // Call RunTests() or press Alt+Shift+T to initiate testing.
+	RunTests();
 }
 
-// You can define other methods, fields, classes and namespaces here
-
 /*
-Inc
-Task:
-- implement the IEmployeeBusiness
-- all interfaces must be used
+# Requirements:
+- As a HR personel, i would like to increase the salary of the employee by using his/her email address and amount of increase 
+and also if i will not give any increase amount of the salary, it sould calculate automatically according to old increases.
+- if there is no increase before, as default %10 percent must be increased the current salary.
 
-# requirements
-- increase the salary of the employee and mark as increased in employee, return the final salary
-- if something happens to should not write in database
-CalculateNextSalaryIncrease 
-- it get all the salary logs and returns mean of the odd salaries increases.
-- final salary must be fetched again
+# Story
+- Core system is already given you these interfaces. 
+- You can only play in the one class that implements the IEmployeeBusiness interface
 
-you are the developer who knows only these interfaces and that's it. no database, no system. nothing.
-you need to make sure that given requirements for the methods will be covered by unit tests.
+# Technical 
+- IncreaseSalary method
+  - increase the salary according to the email
+  - if no increase given, than default increase will be calculated and given inside the method.
+  - if increase given, given increase must be used
+- CalculateNextSalaryIncrease method
+  - with given all salary increases, it calculates the next salary increase with only using odd indexes in the list.
 
+# INFO:
+you are the only developer who knows only these interfaces and that's it. no database, no system. nothing.
+you need to make sure that given requirements for the methods will be fulfilled!
 
-
+# Approach:
+TDD
 
 */
 
@@ -50,7 +54,7 @@ public class EmployeeBusiness : IEmployeeBusiness
 		throw new NotImplementedException();
 	}
 
-	public decimal IncreaseSalary(string name, decimal? salaryIncrease = null)
+	public void IncreaseSalary(string email, decimal? salaryIncrease = null)
 	{
 		throw new NotImplementedException();
 	}
@@ -61,7 +65,7 @@ public class EmployeeBusiness : IEmployeeBusiness
 #region Do not change it
 public interface IEmployeeBusiness
 {
-	decimal IncreaseSalary(string name, decimal? salaryIncrease = null);
+	void IncreaseSalary(string email, decimal? salaryIncrease = null);
 	decimal CalculateNextSalaryIncrease(decimal[] previousSalaryIncreases);
 }
 
@@ -74,26 +78,27 @@ public interface IUnitOfWork : IDisposable
 	void Rollback();
 }
 
-public interface IEmployeeRepository
+public interface IDbEntity
 {
-	Employee Get(string name);
-	void Update(int employeeId, decimal salary);
+	int Id { get; set; }
+}
+public interface IRepository<Entity> where Entity : IDbEntity
+{
+	Entity GetById(int id);
+	IEnumerable<Entity> Get(Expression<Func<Entity, bool>> filter);
+	Entity Update(Entity entity);
+	Entity Insert(Entity entity);
+	void Insert(int id);
 }
 
-public interface ISalaryLogRepository
-{
-	void Insert(SalaryLog log);
-	SalaryLog[] Select(int employeeId);
-}
-
-public class Employee
+public class Employee : IDbEntity
 {
 	public int Id { get; set; }
-	public string Name { get; set; }
+	public string EMail { get; set; }
 	public decimal CurrentSalary { get; set; }
 }
 
-public class SalaryLog
+public class SalaryLog : IDbEntity
 {
 	public int Id { get; set; }
 	public int EmployeeId { get; set; }
@@ -106,18 +111,6 @@ public class SalaryLog
 #region private::Tests
 
 [Fact]
-void When_IncreaseSalary_called_with_salary_Then_returns_value_greater_or_equal_5()
-{
-	//arrange
-	var employeeBusiness = new EmployeeBusiness();
-	var increasingSalary = 5;
-
-	//act
-	var actual = employeeBusiness.IncreaseSalary(It.IsAny<string>(), increasingSalary);
-
-	//assert
-	actual.Should().BeGreaterOrEqualTo(increasingSalary);
-}
-
+void Test()=>true.Should().BeTrue();
 
 #endregion
